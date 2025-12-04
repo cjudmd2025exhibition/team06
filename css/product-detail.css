@@ -1,0 +1,473 @@
+/* Product Detail Page */
+.detail-main {
+    margin-top: 100px;
+}
+
+.detail-hero {
+    padding: 60px 120px 20px 120px;
+}
+
+.breadcrumb {
+    font-size: 14px;
+    color: #666;
+}
+
+.breadcrumb a {
+    color: #573722;
+    text-decoration: none;
+}
+
+.breadcrumb .sep {
+    margin: 0 8px;
+    color: #666;
+}
+
+.detail-title {
+    margin-top: 10px;
+    font-size: 48px;
+    font-weight: 800;
+    color: #573722;
+}
+
+.detail-subtitle {
+    margin-top: 8px;
+    font-size: 18px;
+    color: #573722;
+    opacity: 0.8;
+}
+
+.detail-content {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 40px;
+    padding: 20px 120px 80px 120px;
+    align-items: start;
+}
+
+.gallery-main {
+    width: 100%;
+    background: #F6F6F6;
+    border: 2px solid #E6E6E6;
+    aspect-ratio: 1/1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.gallery-main img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.gallery-thumbs {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.gallery-thumbs img {
+    width: 100%;
+    aspect-ratio: 1/1;
+    object-fit: cover;
+    border: 2px solid #E6E6E6;
+    cursor: pointer;
+    transition: transform .2s ease, border-color .2s ease;
+}
+
+.gallery-thumbs img:hover { transform: scale(1.02); }
+.gallery-thumbs img.active { border-color: #BCD7DE; }
+
+.info .price-line {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.price {
+    font-size: 20px;
+    font-weight: 700;
+    color: #573722;
+    margin-bottom: 16px;
+}
+
+.options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.option {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid #E6E6E6;
+    border-radius: 999px;
+    padding: 10px 14px;
+    background: #fff;
+}
+
+.amount-input {
+    width: 140px;
+    padding: 10px 12px;
+    border: 1px solid #E6E6E6;
+    border-radius: 8px;
+}
+
+.cta-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 8px;
+}
+
+.primary-cta {
+    background-color: #BCD7DE;
+    color: #573722;
+    border: none;
+    padding: 14px 22px;
+    font-size: 16px;
+    font-weight: 700;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: all .2s ease;
+}
+
+.primary-cta:hover { background-color: #A8C5CC; }
+
+.secondary-cta {
+    color: #573722;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.bullets {
+    margin-top: 20px;
+    color: #573722;
+    opacity: .85;
+    line-height: 1.7;
+}
+
+.detail-tabs {
+    padding: 0 120px 120px 120px;
+}
+
+.tabs {
+    display: flex;
+    gap: 8px;
+    border-bottom: 2px solid #F0F0F0;
+}
+
+.tab {
+    background: none;
+    border: none;
+    padding: 12px 16px;
+    cursor: pointer;
+    color: #573722;
+    opacity: .6;
+    font-weight: 700;
+}
+
+.tab.active { opacity: 1; border-bottom: 2px solid #BCD7DE; }
+
+.tab-panels { padding-top: 16px; }
+.panel { display: none; color: #573722; }
+.panel.active { display: block; }
+
+.panel p {
+    margin: 0 0 16px 0;
+    line-height: 1.6;
+    color: #666;
+}
+
+.panel ul {
+    margin: 0;
+    padding-left: 0;
+    list-style: none;
+}
+
+.panel li {
+    margin-bottom: 8px;
+    color: #666;
+    line-height: 1.6;
+}
+
+@media (max-width: 1024px) {
+    .detail-content { grid-template-columns: 1fr; padding: 20px 80px 80px 80px; }
+    .detail-hero { padding: 60px 80px 20px 80px; }
+}
+
+@media (max-width: 768px) {
+    .detail-hero { padding: 40px 60px 10px 60px; }
+    .detail-title { font-size: 28px; }
+    .detail-subtitle { font-size: 14px; }
+    .detail-content { padding: 10px 60px 60px 60px; gap: 24px; }
+    .detail-tabs { padding: 0 60px 80px 60px; }
+}
+
+/* 패키지 박스 스타일 */
+.product-title {
+    margin-bottom: 40px;
+}
+
+.product-title .detail-title {
+    font-size: 32px;
+    font-weight: 700;
+    color: #573722;
+    margin: 0 0 16px 0;
+}
+
+.product-title .detail-subtitle {
+    font-size: 18px;
+    color: #573722;
+    opacity: 0.8;
+    margin: 0;
+}
+
+.buy-box {
+    margin: 40px 0 60px 0;
+}
+
+.buy-now-btn {
+    width: 100%;
+    padding: 16px 24px;
+    background:#573722;
+    color: #fff;
+    border: none;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.buy-now-btn:hover {
+    background: #BCD7DE;
+    transform: translateY(-2px);
+}
+
+.size-info {
+    margin: 40px 0;
+}
+
+.size-info h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #573722;
+    text-transform: uppercase;
+    margin: 0;
+}
+
+.product-description {
+    margin-top: 50px;
+    padding-top: 30px;
+    border-top: 1px solid #eee;
+}
+
+.product-description h4 {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: #573722;
+    text-transform: uppercase;
+}
+
+.product-description p {
+    font-size: 14px;
+    color: #666;
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* FAQ 폼 스타일 */
+.faq-form {
+    margin-bottom: 32px;
+    padding: 24px;
+    background: #f9f9f9;
+    border-radius: 8px;
+}
+
+.faq-form h4 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: #573722;
+}
+
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 6px;
+    color: #333;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    font-family: inherit;
+    resize: vertical;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #573722;
+}
+
+.submit-btn {
+    background: #573722;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+/* FAQ 목록 스타일 */
+.faq-list h4 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: #573722;
+}
+
+.no-questions {
+    text-align: center;
+    color: #666;
+    font-style: italic;
+    padding: 20px;
+}
+
+.faq-item {
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 6px;
+    padding: 16px;
+    margin-bottom: 12px;
+}
+
+.faq-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.faq-name {
+    font-weight: 600;
+    color: #333;
+    font-size: 14px;
+}
+
+.faq-date {
+    font-size: 12px;
+    color: #666;
+}
+
+.faq-question {
+    color: #666;
+    line-height: 1.5;
+    font-size: 14px;
+}
+
+/* Product Detail Images Section */
+.detail-images-section {
+    background: #fff;
+    padding: 80px 0 240px 0;
+}
+
+.detail-images-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 120px;
+}
+
+.detail-images-title {
+    font-size: 32px;
+    font-weight: 700;
+    color: #573722;
+    text-align: center;
+    margin-bottom: 60px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.detail-images-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 40px;
+}
+
+.detail-image {
+    width: 100%;
+    aspect-ratio: 3/4;
+    object-fit: cover;
+}
+
+@media (max-width: 1024px) {
+    .detail-images-container {
+        padding: 0 80px;
+    }
+}
+
+@media (max-width: 768px) {
+    .detail-images-container {
+        padding: 0 40px;
+    }
+    
+    .detail-images-title {
+        font-size: 28px;
+        margin-bottom: 40px;
+    }
+    
+    .detail-images-grid {
+        gap: 30px;
+    }
+}
+
+@media (max-width: 550px) {
+    .detail-hero { padding: 30px 40px 10px 40px; }
+    .detail-title { font-size: 22px; }
+    .detail-subtitle { font-size: 13px; }
+    .detail-content { padding: 10px 40px 40px 40px; gap: 16px; }
+    .detail-tabs { padding: 0 40px 60px 40px; }
+    
+    .detail-images-section {
+        padding: 60px 0;
+    }
+    
+    .detail-images-container {
+        padding: 0 20px;
+    }
+    
+    .detail-images-title {
+        font-size: 24px;
+        margin-bottom: 30px;
+    }
+    
+    .detail-images-grid {
+        gap: 20px;
+    }
+}
+
+
+
+
+
