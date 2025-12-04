@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>헌금하기 - SLEEPISM</title>
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/donation.css">
+    <style>
+        html, body, nav, div, span, a, img, button {
+            cursor: url('img/mouse.png') 32 32, auto !important;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-left">
+            <a href="index.html" class="nav-logo-link">
+                <img src="img/logo.webp" alt="Logo" class="nav-logo">
+            </a>
+        </div>
+        <div class="nav-links">
+            <a href="about2.html" class="nav-link">ABOUT</a>
+            <a href="donation.html" class="nav-link">헌금하기</a>
+            <a href="donation.html?step=ripmind" class="nav-link">R.I.P</a>
+            <a href="bedpro.html" class="nav-link">취침시간 지연 활동</a>
+            <a href="bedpro-test.html" class="nav-link nav-link-test">진단하기</a>
+            <a href="product.html" class="nav-link">PRODUCT</a>
+            <a href="bible.html" class="nav-link">✟ BIBLE ✟</a>
+        </div>
+        
+        <!-- 햄버거 바 -->
+        <div class="hamburger" id="hamburger">
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+        </div>
+    </nav>
+
+    <!-- 모바일 메뉴 -->
+    <div class="mobile-menu" id="mobile-menu">
+        <div class="mobile-menu-content">
+            <a href="about2.html" class="mobile-nav-link">ABOUT</a>
+            <a href="donation.html" class="mobile-nav-link">헌금하기</a>
+            <a href="donation.html?step=ripmind" class="mobile-nav-link">R.I.P</a>
+            <a href="bedpro.html" class="mobile-nav-link">취침시간 지연 활동</a>
+            <a href="bedpro-test.html" class="mobile-nav-link">진단하기</a>
+            <a href="product.html" class="mobile-nav-link">PRODUCT</a>
+            <a href="bible.html" class="mobile-nav-link">✟ BIBLE ✟</a>
+        </div>
+    </div>
+
+    <!-- 메인 컨텐츠 영역 -->
+    <main class="donation-main">
+        <!-- Step 1: 헌금하러가기 -->
+        <section class="donation-step active" id="step-start">
+            <div class="step-container start-container">
+                <img src="img_donation/mainlogo.webp" alt="헌금하기" class="start-logo">
+                <p class="start-text">오늘의 다짐을 내일의 나에게...</p>
+                <img src="img_donation/start.webp" alt="시작하기" class="start-btn" onclick="goToStep('step-manual')" style="cursor: pointer;">
+            </div>
+        </section>
+
+        <!-- Step 2: 헌금하기 사용설명서 -->
+        <section class="donation-step" id="step-manual">
+            <a href="#" class="manual-back-btn" onclick="goBack('step-start'); return false;">&lt; 뒤로가기</a>
+            <div class="step-container manual-container">
+                <div class="manual-left">
+                    <img src="img_donation/mainlogo.webp" alt="메인 로고" class="manual-mainlogo">
+                    <p class="manual-welcome-text">디지털 헌금 서비스에 오신 것을 환영합니다!<br>이곳에서 오늘의 다짐을 적어보세요!</p>
+                    
+                </div>
+                <div class="manual-right">
+                    <img src="img_donation/explain1.webp" alt="설명" class="manual-explain">
+                    <p class="manual-cta-text">지금 바로, 나에게 편지를 써보세요!</p>
+                    <button class="donation-btn manual-next-btn" onclick="goToStep('step-privacy')">다음</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Step 3: 개인정보 동의 -->
+        <section class="donation-step" id="step-privacy">
+            <a href="#" class="donation-back-btn" onclick="goBack('step-manual'); return false;">&lt; 뒤로가기</a>
+            <div class="step-container">
+                <div class="warning-container">
+                    <div class="warning-buttons">
+                        <img src="img_donation/yesbt.webp" alt="Yes" class="warning-btn yes-btn" onclick="showPhoneField()">
+                        <img src="img_donation/nobtn.webp" alt="No" class="warning-btn no-btn" onclick="hidePhoneField()">
+                    </div>
+                    <img src="img_donation/warring.webp" alt="Warning" class="warning-image">
+                </div>
+            </div>
+        </section>
+
+        <!-- Step 4: 편지쓰기 -->
+        <section class="donation-step" id="step-letter">
+            <a href="#" class="donation-back-btn" onclick="goBack('step-privacy'); return false;">&lt; 뒤로가기</a>
+            <div class="step-container">
+                <div class="letter-form" style="padding-top: 180px;">
+                    <img src="img_donation/Namemini.webp" alt="name mini" class="namemini-image">
+                    <div class="input-wrapper">
+                        <img src="img_donation/~a.webp" alt="name input" class="input-image">
+                        <input type="text" id="nickname" class="input-field-overlay" placeholder="별명을 입력하세요 (최대 6자)" maxlength="6" required>
+                    </div>
+                    <div id="phone-field" class="phone-field" style="display: none;">
+                        <div style="display: flex; align-items: center; justify-content: flex-start; gap: 40px;">
+                            <img src="img_donation/TELL.webp" alt="tell" class="tell-image">
+                            <label class="privacy-checkbox-label">
+                                <input type="checkbox" class="privacy-checkbox">
+                                <span>개인정보 수집·이용 동의</span>
+                            </label>
+                        </div>
+                        <div class="input-wrapper">
+                            <img src="img_donation/~a.webp" alt="tell input" class="input-image">
+                            <input type="tel" id="phone" class="input-field-overlay" placeholder="전화번호를 입력하세요">
+                        </div>
+                    </div>
+                    <div class="button-group">
+                        <button class="donation-btn" onclick="checkPrivacyConsent()">다음</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Step 5: 편지 내용 쓰기 -->
+        <section class="donation-step" id="step-letter-content">
+            <a href="#" class="donation-back-btn" onclick="goBack('step-letter'); return false;">&lt; 뒤로가기</a>
+            <div class="step-container">
+                <h1 class="donation-title"></h1>
+                <div class="letter-form">
+                    <div class="letter-input-wrapper">
+                        <img src="img_donation/letter2.webp" alt="letter input" class="letter-input-image">
+                        <img src="img_donation/letter1.webp" alt="letter overlay" class="letter-overlay-image">
+                        <textarea id="letter-content" class="letter-textarea-overlay" placeholder="편지 내용을 작성하세요..." required></textarea>
+                    </div>
+                    <div class="button-group">
+                        <button class="donation-btn secondary" onclick="clearLetterContent()">전체삭제</button>
+                        <button class="donation-btn" onclick="goToStep('step-destination')">전송하기</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Step 6: 나의 편지를 어디로 보낼까요? -->
+        <section class="donation-step" id="step-destination">
+            <a href="#" class="donation-back-btn" onclick="goBack('step-letter-content'); return false;">&lt; 뒤로가기</a>
+            <div class="step-container">
+                <img src="img_donation/wheremy.webp" alt="나의 편지를 어디로 보낼까요?" class="donation-title-image">
+                <div class="destination-buttons">
+                    <img src="img_donation/offeringgroup.webp" alt="헌금하기" class="destination-btn-image" onclick="sendToLive()">
+                    <img src="img_donation/ripmindgroup.webp" alt="RIP MIND" class="destination-btn-image" onclick="sendToRipMind()">
+                </div>
+            </div>
+        </section>
+
+        <!-- Step 6: 전송 중 (RIP MIND) -->
+        <section class="donation-step" id="step-sending">
+            <div class="step-container">
+                <img src="img_donation/ripmindtxt.webp" alt="RIP MIND" class="ripmind-title-image">
+                <img src="img_donation/ripmindimg.webp" alt="RIP MIND" class="ripmind-image">
+                <p class="ripmind-loading-text">
+                    <span class="wave-text">나</span>
+                    <span class="wave-text">의</span>
+                    <span class="wave-text"> </span>
+                    <span class="wave-text">편</span>
+                    <span class="wave-text">지</span>
+                    <span class="wave-text">를</span>
+                    <span class="wave-text"> </span>
+                    <span class="wave-text">R</span>
+                    <span class="wave-text">I</span>
+                    <span class="wave-text">P</span>
+                    <span class="wave-text"> </span>
+                    <span class="wave-text">M</span>
+                    <span class="wave-text">I</span>
+                    <span class="wave-text">N</span>
+                    <span class="wave-text">D</span>
+                    <span class="wave-text"> </span>
+                    <span class="wave-text">묘</span>
+                    <span class="wave-text">지</span>
+                    <span class="wave-text">로</span>
+                    <span class="wave-text"> </span>
+                    <span class="wave-text">옮</span>
+                    <span class="wave-text">기</span>
+                    <span class="wave-text">는</span>
+                    <span class="wave-text"> </span>
+                    <span class="wave-text">중</span>
+                    <span class="wave-text">.</span>
+                    <span class="wave-text">.</span>
+                    <span class="wave-text">.</span>
+                </p>
+            </div>
+        </section>
+
+        <!-- Step 7: 헌금하기 로딩 중 -->
+        <section class="donation-step" id="step-sending-donation">
+            <div class="step-container">
+                <img src="img_donation/offeringtxt.webp" alt="헌금하기" class="offering-title-image">
+                <img src="img_donation/offeringimg.webp" alt="Offering" class="offering-image">
+                <p class="offering-loading-text">
+                    <span class="wave-text">나</span>
+                    <span class="wave-text">의</span>
+                    <span class="wave-text"> </span>
+                    <span class="wave-text">편</span>
+                    <span class="wave-text">지</span>
+                    <span class="wave-text">를</span>
+                    <span class="wave-text"> </span>
+                    <span class="wave-text">헌</span>
+                    <span class="wave-text">금</span>
+                    <span class="wave-text">하</span>
+                    <span class="wave-text">는</span>
+                    <span class="wave-text"> </span>
+                    <span class="wave-text">중</span>
+                    <span class="wave-text">.</span>
+                    <span class="wave-text">.</span>
+                    <span class="wave-text">.</span>
+                </p>
+            </div>
+        </section>
+
+        <!-- Step 8: 헌금 완료 -->
+        <section class="donation-step" id="step-donation-complete">
+            <div class="step-container">
+                <img src="img_donation/letterendtxt.webp" alt="헌금완료" class="complete-title-image">
+                <img src="img_donation/letterend.webp" alt="Letter End" class="complete-image">
+                <div class="complete-button-group">
+                    <button class="donation-btn complete-btn" onclick="goToStep('step-start')">처음으로</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Step 9: RIP MIND -->
+        <section class="donation-step" id="step-ripmind">
+            <div class="step-container">
+                <img src="img_donation/ripmindtxt.webp" alt="RIP MIND" class="ripmind-title-img">
+                <img src="img_donation/ripbg.webp" alt="RIP Background" class="ripmind-bg-img">
+                <div class="ripmind-list" id="ripmind-list">
+                    <!-- RIP MIND 목록 (별명, 작성시간만 표시) -->
+                </div>
+                <div class="ripmind-button-group">
+                    <button class="donation-btn ripmind-btn" onclick="goToStep('step-start')">처음으로</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- RIP MIND 상세 모달 -->
+    <div class="ripmind-modal" id="ripmind-modal">
+        <div class="ripmind-modal-content">
+            <button class="ripmind-modal-close" onclick="closeRipMindModal()">&times;</button>
+            <div class="ripmind-detail-image-wrapper">
+                <img src="img_donation/ripbigimg.webp" alt="RIP MIND Detail" class="ripmind-detail-image">
+                <div class="ripmind-detail-text">
+                    <p class="ripmind-detail-nickname" id="ripmind-detail-nickname">마멋님의RIP MIND</p>
+                    <p class="ripmind-detail-time" id="ripmind-detail-time">-2025.08.15 21:21:20부터</p>
+                    <p class="ripmind-detail-eternal">영면에 들다.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/donation.js"></script>
+</body>
+</html>

@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video - Sleepism</title>
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+            overflow: hidden;
+        }
+        
+        html, body, button {
+            cursor: url('img/mouse.png') 32 32, auto !important;
+        }
+        
+        #video-overlay {
+            display: flex;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 99999;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        #close-video-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            font-size: 32px;
+            cursor: pointer;
+            z-index: 100000;
+            color: #fff;
+            font-weight: 100;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s ease;
+            transform: scale(0.9);
+        }
+        
+        #close-video-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        #video-overlay {
+            opacity: 0;
+            animation: fadeIn 0.5s ease-in forwards;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        
+        #fullscreen-video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        
+        /* 비디오 재생바 컨테이너 */
+        #video-controls {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            max-width: 800px;
+            z-index: 100001;
+        }
+        
+        /* 재생바 */
+        #video-progress {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 3px;
+            cursor: pointer;
+            position: relative;
+            transition: height 0.2s ease;
+        }
+        
+        #video-progress:hover {
+            height: 8px;
+        }
+        
+        /* 재생 진행 표시 */
+        #video-progress-bar {
+            height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 3px;
+            width: 0%;
+            transition: width 0.1s linear;
+        }
+        
+        /* 재생바 핸들 */
+        #video-progress-handle {
+            position: absolute;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 14px;
+            height: 14px;
+            background: #fff;
+            border-radius: 50%;
+            cursor: grab;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+        
+        #video-progress:hover #video-progress-handle {
+            opacity: 1;
+        }
+        
+        #video-progress-handle:active {
+            cursor: grabbing;
+        }
+    </style>
+</head>
+<body>
+    <!-- 전체화면 비디오 오버레이 -->
+    <div id="video-overlay">
+        <button id="close-video-btn">×</button>
+        <video id="fullscreen-video" autoplay muted>
+            <source src="img_product/pro2_next.mp4" type="video/mp4">
+        </video>
+        <audio id="video-audio" autoplay loop>
+            <source src="img_product/pro2_next.mp3" type="audio/mpeg">
+        </audio>
+        
+        <!-- 비디오 재생바 -->
+        <div id="video-controls">
+            <div id="video-progress">
+                <div id="video-progress-bar"></div>
+                <div id="video-progress-handle"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const videoOverlay = document.getElementById('video-overlay');
+            const fullscreenVideo = document.getElementById('fullscreen-video');
+            const videoAudio = document.getElementById('video-audio');
+            const closeBtn = document.getElementById('close-video-btn');
+            const videoProgress = document.getElementById('video-progress');
+            const videoProgressBar = document.getElementById('video-progress-bar');
+            const videoProgressHandle = document.getElementById('video-progress-handle');
+            let isDragging = false;
+            
+            // 페이지 로드 시 비디오와 오디오 재생
+            if (fullscreenVideo) {
+                fullscreenVideo.play().then(() => {
+                    // 비디오 재생 성공 시 오디오도 재생
+                    if (videoAudio) {
+                        videoAudio.play().catch(error => {
+                            console.log('오디오 재생 실패:', error);
+                        });
+                    }
+                }).catch(error => {
+                    console.log('비디오 자동 재생 실패:', error);
+                });
+            }
+            
+            // 비디오와 오디오 동기화
+            if (fullscreenVideo && videoAudio) {
+                // 비디오 재생 시 오디오도 재생
+                fullscreenVideo.addEventListener('play', function() {
+                    videoAudio.play().catch(error => {
+                        console.log('오디오 재생 실패:', error);
+                    });
+                });
+                
+                // 비디오 일시정지 시 오디오도 일시정지
+                fullscreenVideo.addEventListener('pause', function() {
+                    videoAudio.pause();
+                });
+                
+                // 비디오 시간 동기화
+                fullscreenVideo.addEventListener('timeupdate', function() {
+                    if (!isDragging && Math.abs(videoAudio.currentTime - fullscreenVideo.currentTime) > 0.5) {
+                        videoAudio.currentTime = fullscreenVideo.currentTime;
+                    }
+                    
+                    // 재생바 업데이트
+                    if (fullscreenVideo.duration) {
+                        const percent = (fullscreenVideo.currentTime / fullscreenVideo.duration) * 100;
+                        videoProgressBar.style.width = percent + '%';
+                        videoProgressHandle.style.left = percent + '%';
+                    }
+                });
+            }
+            
+            // 재생바 클릭/드래그 기능
+            if (videoProgress && fullscreenVideo) {
+                function setVideoTime(e) {
+                    const rect = videoProgress.getBoundingClientRect();
+                    const percent = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+                    const newTime = percent * fullscreenVideo.duration;
+                    
+                    fullscreenVideo.currentTime = newTime;
+                    if (videoAudio) {
+                        videoAudio.currentTime = newTime;
+                    }
+                }
+                
+                // 클릭으로 이동
+                videoProgress.addEventListener('click', function(e) {
+                    if (!isDragging) {
+                        setVideoTime(e);
+                    }
+                });
+                
+                // 드래그 시작
+                videoProgressHandle.addEventListener('mousedown', function(e) {
+                    e.preventDefault();
+                    isDragging = true;
+                });
+                
+                // 드래그 중
+                document.addEventListener('mousemove', function(e) {
+                    if (isDragging) {
+                        setVideoTime(e);
+                    }
+                });
+                
+                // 드래그 종료
+                document.addEventListener('mouseup', function() {
+                    isDragging = false;
+                });
+                
+                // 터치 이벤트 지원
+                videoProgress.addEventListener('touchstart', function(e) {
+                    e.preventDefault();
+                    isDragging = true;
+                    setVideoTime(e.touches[0]);
+                });
+                
+                document.addEventListener('touchmove', function(e) {
+                    if (isDragging) {
+                        e.preventDefault();
+                        setVideoTime(e.touches[0]);
+                    }
+                });
+                
+                document.addEventListener('touchend', function() {
+                    isDragging = false;
+                });
+            }
+            
+            // X 버튼 클릭 시 product.html로 이동
+            if (closeBtn) {
+                closeBtn.addEventListener('click', function() {
+                    if (fullscreenVideo) {
+                        fullscreenVideo.pause();
+                    }
+                    if (videoAudio) {
+                        videoAudio.pause();
+                        videoAudio.currentTime = 0;
+                    }
+                    window.location.href = 'product.html';
+                });
+            }
+            
+            // 비디오 종료 시 자동으로 product.html로 이동
+            if (fullscreenVideo) {
+                fullscreenVideo.addEventListener('ended', function() {
+                    if (videoAudio) {
+                        videoAudio.pause();
+                        videoAudio.currentTime = 0;
+                    }
+                    window.location.href = 'product.html';
+                });
+            }
+        });
+    </script>
+</body>
+</html>

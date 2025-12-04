@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sleepism Bible</title>
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <style>
+        html, body, nav, div, span, a, img, button {
+            cursor: url('img/mouse.png') 32 32, auto !important;
+        }
+
+        /* 성경 뷰어 스타일 */
+        .bible-viewer {
+            margin-top: 80px;
+            height: calc(100vh - 80px);
+            max-height: calc(100vh - 80px);
+            background: transparent;
+            padding: 40px 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            position: relative;
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding-top: 70px;
+        }
+
+
+        /* PDF 위 헤더 이미지 */
+        .bible-header-image {
+            width: 100%;
+            max-width: 800px;
+            margin-bottom: 36px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .bible-header-image img {
+            width: 100%;
+            max-width: 600px;
+            height: auto;
+            object-fit: contain;
+        }
+
+        .bible-book-container {
+            display: flex;
+            flex-direction: row;
+            gap: 0;
+            perspective: 2000px;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            max-width: 1200px;
+            min-width: 1000px;
+            width: auto;
+            flex-wrap: nowrap;
+            margin: 0 auto;
+        }
+
+
+        #biblePages {
+            display: flex !important;
+            flex-direction: row !important;
+            gap: 0 !important;
+            align-items: center !important;
+            justify-content: center !important;
+            width: 100% !important;
+            flex-wrap: nowrap !important;
+            min-width: 1000px;
+        }
+
+
+        .bible-page {
+            width: 500px;
+            min-width: 500px;
+            max-width: 500px;
+            min-height: auto;
+            max-height: calc(100vh - 250px);
+            background: transparent;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.6s ease, z-index 0.3s ease;
+            padding: 60px 50px;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .bible-page.left-page {
+            border-radius: 0 8px 8px 0;
+            border: none;
+        }
+
+        .bible-page.right-page {
+            border-radius: 8px 0 0 8px;
+            border: none;
+        }
+
+
+        .bible-page.turning {
+            transform: rotateY(-180deg);
+            z-index: 100;
+        }
+
+        .page-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #573722;
+        }
+
+        .book-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #573722;
+            margin-bottom: 8px;
+        }
+
+        .chapter-info {
+            font-size: 16px;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .page-text {
+            flex: 1;
+            font-size: 18px;
+            line-height: 2;
+            color: #333;
+            text-align: justify;
+            padding: 20px 0;
+        }
+
+        .verse {
+            margin-bottom: 12px;
+        }
+
+        .verse-number {
+            color: #573722;
+            font-weight: 600;
+            font-size: 14px;
+            margin-right: 8px;
+        }
+
+        .page-footer {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+            color: #999;
+            font-size: 14px;
+        }
+
+        .nav-btn {
+            position: fixed !important;
+            top: 50% !important;
+            transform: translateY(-50%) !important;
+            background: rgba(87, 55, 34, 0.9) !important;
+            color: white !important;
+            border: none !important;
+            width: 60px !important;
+            height: 60px !important;
+            border-radius: 50% !important;
+            font-size: 28px !important;
+            cursor: pointer !important;
+            z-index: 99999 !important;
+            transition: all 0.3s ease !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            box-shadow: none !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            pointer-events: auto !important;
+        }
+
+        .nav-btn:hover {
+            background: rgba(87, 55, 34, 1);
+            transform: translateY(-50%) scale(1.1);
+            box-shadow: none !important;
+        }
+
+        .nav-btn:active {
+            transform: translateY(-50%) scale(0.95);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .prev-btn {
+            left: 300px !important;
+        }
+
+        .next-btn {
+            right: 300px !important;
+        }
+
+
+        /* PDF 업로드 영역 */
+        .upload-area {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 2000;
+            background: white;
+            padding: 60px 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(87, 55, 34, 0.2);
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .upload-area.hidden {
+            display: none;
+        }
+
+        .upload-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #573722;
+            margin-bottom: 20px;
+        }
+
+        .upload-description {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .upload-btn {
+            background: #573722;
+            color: white;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 30px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .upload-btn:hover {
+            background: #3d2617;
+            transform: scale(1.05);
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .pdf-page canvas {
+            display: block;
+            max-width: 100%;
+            height: auto;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            background: white;
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
+        }
+        
+        /* 텍스트 레이어 스타일 */
+        .textLayer {
+            position: absolute;
+            left: 0;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            overflow: hidden;
+            opacity: 1;
+            line-height: 1.0;
+        }
+        
+        .textLayer > span {
+            color: transparent;
+            position: absolute;
+            white-space: pre;
+            cursor: text;
+            transform-origin: 0% 0%;
+        }
+        
+        .textLayer .highlight {
+            margin: -1px;
+            padding: 1px;
+            background-color: rgba(180, 0, 170, 0.2);
+            border-radius: 4px;
+        }
+        
+        .textLayer .highlight.selected {
+            background-color: rgba(0, 100, 0, 0.2);
+        }
+
+        /* 로딩 상태 */
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: #573722;
+            font-size: 18px;
+            z-index: 1000;
+        }
+
+        .loading.hidden {
+            display: none;
+        }
+
+        /* 페이지 검색 영역 */
+        .page-search {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(87, 55, 34, 0.9);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 30px;
+            box-shadow: 0 4px 12px rgba(87, 55, 34, 0.3);
+            backdrop-filter: blur(10px);
+            white-space: nowrap;
+            flex-wrap: nowrap;
+        }
+
+        .page-search input {
+            width: 80px;
+            padding: 8px 12px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            font-size: 16px;
+            text-align: center;
+            outline: none;
+            background: rgba(255, 255, 255, 0.95);
+            color: rgba(87, 55, 34, 0.9);
+            transition: border-color 0.3s ease;
+        }
+
+        .page-search input:focus {
+            border-color: rgba(255, 255, 255, 0.8);
+        }
+
+        .page-search button {
+            padding: 8px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .page-search button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .page-search span {
+            color: white;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        /* 모바일 반응형 */
+        @media (max-width: 768px) {
+            .bible-viewer {
+                padding: 20px 10px;
+                overflow-x: hidden;
+            }
+
+            .bible-header-image {
+                max-width: 100%;
+                margin-bottom: 30px;
+            }
+
+            .bible-header-image img {
+                max-width: 90%;
+            }
+
+            .bible-book-container {
+                flex-direction: row;
+                gap: 0;
+                justify-content: center;
+                min-width: auto;
+                max-width: 100%;
+                width: 100%;
+            }
+
+            #biblePages {
+                min-width: auto !important;
+                width: 100% !important;
+            }
+
+            .bible-page {
+                width: 85vw;
+                max-width: 380px;
+                min-width: 85vw;
+                min-height: auto;
+                max-height: 65vh;
+                padding: 30px 24px;
+                background: transparent;
+                box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+            }
+
+            .bible-page.left-page,
+            .bible-page.right-page {
+                border-radius: 8px;
+                border: none;
+            }
+            
+            /* 모바일에서는 spread의 오른쪽 페이지만 숨기기 (표지는 제외) */
+            .bible-page.left-page + .bible-page.right-page {
+                display: none;
+            }
+            
+            /* 표지 페이지는 항상 보이도록 */
+            .bible-page.cover-page {
+                display: flex !important;
+            }
+
+            .book-title {
+                font-size: 20px;
+            }
+
+            .page-text {
+                font-size: 16px;
+                line-height: 1.8;
+            }
+
+            .nav-btn {
+                width: 50px !important;
+                height: 50px !important;
+                font-size: 24px !important;
+                top: 50% !important;
+                transform: translateY(-50%) !important;
+                display: flex !important;
+                visibility: visible !important;
+                opacity: 1 !important;
+                z-index: 99999 !important;
+                box-shadow: none !important;
+            }
+            
+            .nav-btn:hover {
+                transform: translateY(-50%) scale(1.1);
+                box-shadow: none !important;
+            }
+            
+            .nav-btn:active {
+                transform: translateY(-50%) scale(0.95);
+            }
+
+            .prev-btn {
+                left: 20px !important;
+            }
+
+            .next-btn {
+                right: 20px !important;
+            }
+
+            .page-search {
+                bottom: 20px;
+                padding: 10px 15px;
+                font-size: 12px;
+                white-space: nowrap;
+                flex-wrap: nowrap;
+            }
+
+            .page-search input {
+                width: 60px;
+                padding: 6px 10px;
+                font-size: 14px;
+                flex-shrink: 0;
+            }
+
+            .page-search button {
+                padding: 6px 15px;
+                font-size: 12px;
+                flex-shrink: 0;
+            }
+
+            .page-search span {
+                font-size: 12px;
+                white-space: nowrap;
+                flex-shrink: 0;
+            }
+        }
+
+        @media (max-width: 550px) {
+            .bible-viewer {
+                overflow-x: hidden;
+            }
+
+            .bible-header-image {
+                margin-bottom: 15px;
+            }
+
+            .bible-header-image img {
+                max-width: 75%;
+            }
+
+            .page-search {
+                white-space: nowrap;
+                flex-wrap: nowrap;
+                padding: 8px 12px;
+                gap: 8px;
+            }
+
+            .page-search input {
+                flex-shrink: 0;
+            }
+
+            .page-search button {
+                flex-shrink: 0;
+            }
+
+            .page-search span {
+                white-space: nowrap;
+                flex-shrink: 0;
+            }
+
+            .bible-page {
+                width: 85vw;
+                max-width: 380px;
+                min-width: 85vw;
+                padding: 20px 15px;
+                min-height: auto;
+                max-height: 60vh;
+                background: transparent;
+                box-shadow: 0 6px 25px rgba(0, 0, 0, 0.3);
+            }
+
+            .book-title {
+                font-size: 18px;
+            }
+
+            .page-text {
+                font-size: 14px;
+                line-height: 1.6;
+            }
+
+            .nav-btn {
+                width: 45px !important;
+                height: 45px !important;
+                font-size: 20px !important;
+                display: flex !important;
+                visibility: visible !important;
+                opacity: 1 !important;
+                z-index: 99999 !important;
+                box-shadow: none !important;
+            }
+            
+            /* 폰 모드에서도 spread의 오른쪽 페이지만 숨기기 (표지는 제외) */
+            .bible-page.left-page + .bible-page.right-page {
+                display: none;
+            }
+            
+            /* 표지 페이지는 항상 보이도록 */
+            .bible-page.cover-page {
+                display: flex !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-left">
+            <a href="index.html" class="nav-logo-link">
+                <img src="img/logo.webp" alt="Logo" class="nav-logo">
+            </a>
+        </div>
+        <div class="nav-links">
+            <a href="about2.html" class="nav-link">ABOUT</a>
+            <a href="donation.html" class="nav-link">헌금하기</a>
+            <a href="donation.html?step=ripmind" class="nav-link">R.I.P</a>
+            <a href="bedpro.html" class="nav-link">취침시간 지연 활동</a>
+            <a href="bedpro-test.html" class="nav-link nav-link-test">진단하기</a>
+            <a href="product.html" class="nav-link">PRODUCT</a>
+            <a href="bible.html" class="nav-link">✟ BIBLE ✟</a>
+        </div>
+        
+        <!-- 햄버거 바 -->
+        <div class="hamburger" id="hamburger">
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+        </div>
+    </nav>
+
+    <!-- 모바일 메뉴 -->
+    <div class="mobile-menu" id="mobile-menu">
+        <div class="mobile-menu-content">
+            <a href="about2.html" class="mobile-nav-link">ABOUT</a>
+            <a href="donation.html" class="mobile-nav-link">헌금하기</a>
+            <a href="donation.html?step=ripmind" class="mobile-nav-link">R.I.P</a>
+            <a href="bedpro.html" class="mobile-nav-link">취침시간 지연 활동</a>
+            <a href="bedpro-test.html" class="mobile-nav-link">진단하기</a>
+            <a href="product.html" class="mobile-nav-link">PRODUCT</a>
+            <a href="bible.html" class="mobile-nav-link">✟ BIBLE ✟</a>
+        </div>
+    </div>
+
+    <!-- 페이지 검색 -->
+    <div class="page-search" id="pageSearch" style="display: none;">
+        <span>페이지</span>
+        <input type="number" id="pageInput" min="1" placeholder="1" />
+        <span>/ <span id="totalPagesDisplay">1</span></span>
+        <button onclick="goToPage()">이동</button>
+    </div>
+
+    <!-- 성경 뷰어 -->
+    <main class="bible-viewer">
+        <div class="bible-header-image">
+            <img src="img/sleepismis.webp" alt="Sleepism" />
+        </div>
+        <div class="loading" id="loading">PDF 로딩 중...</div>
+        
+        <button class="nav-btn prev-btn" id="prevBtn" onclick="prevPage()">‹</button>
+        <button class="nav-btn next-btn" id="nextBtn" onclick="nextPage()">›</button>
+        
+        <div class="bible-book-container" id="bibleContainer" style="display: none;">
+            <div id="biblePages"></div>
+        </div>
+
+    </main>
+
+    <script src="script.js"></script>
+    <script>
+        // PDF.js 워커 설정
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+        let pdfDoc = null;
+        let currentPage = 0;
+        let totalPages = 0;
+
+        // PDF 파일 로드 (URL에서 직접 로드)
+        async function loadPDFFromURL(url) {
+            const loadingEl = document.getElementById('loading');
+            loadingEl.style.display = 'block';
+            
+            try {
+                console.log('PDF 로딩 시작:', url);
+                
+                // 파일명에 공백이 있으면 인코딩
+                const encodedUrl = encodeURI(url);
+                
+                pdfDoc = await pdfjsLib.getDocument({
+                    url: encodedUrl,
+                    // 폰트 렌더링 설정
+                    useSystemFonts: false, // PDF 내장 폰트 사용
+                    disableFontFace: false,
+                    // CMap 설정 (한국어 폰트를 위해 필요)
+                    cMapUrl: 'https://unpkg.com/pdfjs-dist@3.11.174/cmaps/',
+                    cMapPacked: true,
+                    // 에러가 발생해도 계속 진행
+                    stopAtErrors: false,
+                    // 폰트 로딩 실패 시에도 계속 진행
+                    verbosity: 0, // 경고 메시지 최소화
+                }).promise;
+                
+                totalPages = pdfDoc.numPages;
+                currentPage = 0;
+                
+                console.log('PDF 로드 성공, 총 페이지:', totalPages);
+                
+                // 로딩 숨기기
+                loadingEl.style.display = 'none';
+                // 뷰어 표시
+                const container = document.getElementById('bibleContainer');
+                container.style.display = 'flex';
+                // 페이지 검색 영역 표시
+                document.getElementById('pageSearch').style.display = 'flex';
+                document.getElementById('totalPagesDisplay').textContent = totalPages;
+                document.getElementById('pageInput').max = totalPages;
+                
+                renderPages();
+            } catch (error) {
+                console.error('PDF 로드 실패:', error);
+                loadingEl.textContent = 'PDF 로드 실패: ' + error.message;
+                loadingEl.style.color = '#ff0000';
+                console.error('에러 상세:', error);
+            }
+        }
+
+        // 페이지 렌더링
+        async function renderPages() {
+            const container = document.getElementById('biblePages');
+            container.innerHTML = '';
+            
+            console.log('렌더링 시작, currentPage:', currentPage, 'totalPages:', totalPages);
+
+            // 첫 페이지(표지)는 혼자 보임
+            if (currentPage === 0) {
+                console.log('표지 페이지 렌더링');
+                const coverPage = await renderPDFPage(0);
+                if (coverPage) {
+                    // 모바일에서도 표지가 보이도록 cover-page 클래스 추가
+                    coverPage.className = 'bible-page right-page cover-page';
+                    container.appendChild(coverPage);
+                    console.log('표지 페이지 추가됨');
+                }
+            } else {
+                // 그 다음부터는 2페이지씩 펼쳐서 보임
+                // currentPage가 1이면 2-3페이지를 보여줌
+                // currentPage가 2이면 2-3페이지를 보여줌 (같은 spread)
+                // currentPage가 3이면 4-5페이지를 보여줌
+                
+                // spread 계산: currentPage를 기준으로 왼쪽/오른쪽 페이지 결정
+                let leftPageNum, rightPageNum;
+                
+                if (currentPage === 1) {
+                    // 첫 spread: 2-3페이지
+                    leftPageNum = 1;  // 2페이지 (인덱스는 0부터)
+                    rightPageNum = 2; // 3페이지
+                } else {
+                    // 그 다음 spread들: 짝수-홀수 쌍
+                    // currentPage가 3이면 4-5페이지 (인덱스 3-4)
+                    // currentPage가 5이면 6-7페이지 (인덱스 5-6)
+                    leftPageNum = currentPage;
+                    rightPageNum = currentPage + 1;
+                }
+                
+                console.log('Spread 렌더링:', 'leftPageNum:', leftPageNum, 'rightPageNum:', rightPageNum);
+                
+                // 왼쪽 페이지 렌더링
+                if (leftPageNum < totalPages) {
+                    const leftPage = await renderPDFPage(leftPageNum);
+                    if (leftPage) {
+                        leftPage.className = 'bible-page left-page';
+                        container.appendChild(leftPage);
+                        console.log('왼쪽 페이지 추가됨:', leftPageNum);
+                    }
+                }
+                
+                // 오른쪽 페이지 렌더링
+                if (rightPageNum < totalPages) {
+                    const rightPage = await renderPDFPage(rightPageNum);
+                    if (rightPage) {
+                        rightPage.className = 'bible-page right-page';
+                        container.appendChild(rightPage);
+                        console.log('오른쪽 페이지 추가됨:', rightPageNum);
+                    }
+                } else {
+                    // 마지막 페이지면 빈 오른쪽 페이지
+                    const rightPage = document.createElement('div');
+                    rightPage.className = 'bible-page right-page';
+                    rightPage.innerHTML = `
+                        <div class="page-content">
+                            <div class="page-text" style="display: flex; align-items: center; justify-content: center; height: 100%;">
+                                <div style="text-align: center; color: #999;">
+                                    <p style="font-size: 24px; margin-bottom: 20px;">끝</p>
+                                    <p>이전 페이지로 돌아가세요</p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    container.appendChild(rightPage);
+                    console.log('빈 오른쪽 페이지 추가됨');
+                }
+                
+                console.log('컨테이너 자식 개수:', container.children.length);
+                console.log('컨테이너 너비:', container.offsetWidth);
+                console.log('컨테이너 스타일:', window.getComputedStyle(container).display);
+            }
+
+            updatePageCounter();
+            updateNavButtons();
+        }
+
+        // PDF 페이지 렌더링
+        async function renderPDFPage(pageNum) {
+            try {
+                const page = await pdfDoc.getPage(pageNum + 1); // PDF.js는 1부터 시작
+                
+                // 반응형 컨테이너 너비 계산
+                const isMobile = window.innerWidth <= 768;
+                const isPhone = window.innerWidth <= 550;
+                let containerWidth;
+                
+                if (isPhone) {
+                    // 폰 모드: 85vw - padding
+                    containerWidth = window.innerWidth * 0.85 - 30; // 15px * 2
+                } else if (isMobile) {
+                    // 모바일 모드: 85vw - padding
+                    containerWidth = window.innerWidth * 0.85 - 48; // 24px * 2
+                } else {
+                    // 데스크톱: 500px - padding
+                    containerWidth = 500 - 100; // padding 제외
+                }
+                
+                const viewport = page.getViewport({ scale: 1.0 });
+                let scale = Math.min(containerWidth / viewport.width, 2.0); // 최대 2배까지
+                
+                // 모바일/폰 모드에서 높이 제한 고려
+                if (isMobile) {
+                    const maxHeight = isPhone ? window.innerHeight * 0.6 : window.innerHeight * 0.65;
+                    const heightScale = maxHeight / viewport.height;
+                    scale = Math.min(scale, heightScale);
+                }
+                
+                const scaledViewport = page.getViewport({ scale: scale });
+                
+                console.log('페이지 스케일:', scale, '원본 크기:', viewport.width, 'x', viewport.height);
+                
+                const canvas = document.createElement('canvas');
+                const context = canvas.getContext('2d');
+                
+                // 고해상도 렌더링을 위한 DPR 고려
+                const dpr = window.devicePixelRatio || 1;
+                canvas.width = scaledViewport.width * dpr;
+                canvas.height = scaledViewport.height * dpr;
+                canvas.style.width = scaledViewport.width + 'px';
+                canvas.style.height = scaledViewport.height + 'px';
+                
+                // 고해상도 렌더링을 위한 컨텍스트 스케일
+                context.scale(dpr, dpr);
+                
+                // Canvas 렌더링 품질 개선
+                context.imageSmoothingEnabled = true;
+                context.imageSmoothingQuality = 'high';
+                
+                const pageDiv = document.createElement('div');
+                pageDiv.className = `bible-page ${pageNum % 2 === 0 ? 'left-page' : 'right-page'}`;
+                pageDiv.style.position = 'relative';
+                
+                const pageContent = document.createElement('div');
+                pageContent.className = 'page-content';
+                pageContent.style.padding = '0';
+                pageContent.style.display = 'flex';
+                pageContent.style.flexDirection = 'column';
+                pageContent.style.height = '100%';
+                pageContent.style.position = 'relative';
+                
+                const canvasWrapper = document.createElement('div');
+                canvasWrapper.style.flex = '1';
+                canvasWrapper.style.overflow = 'auto';
+                canvasWrapper.style.display = 'flex';
+                canvasWrapper.style.alignItems = 'flex-start';
+                canvasWrapper.style.justifyContent = 'center';
+                canvasWrapper.style.padding = '20px';
+                canvasWrapper.style.backgroundColor = '#f5f5f5';
+                canvasWrapper.style.position = 'relative';
+                
+                // Canvas를 wrapper에 추가
+                canvasWrapper.appendChild(canvas);
+                pageContent.appendChild(canvasWrapper);
+                
+                const footer = document.createElement('div');
+                footer.className = 'page-footer';
+                footer.textContent = `${pageNum + 1}쪽`;
+                pageContent.appendChild(footer);
+                
+                pageDiv.appendChild(pageContent);
+                
+                // PDF 렌더링 (텍스트 포함)
+                const renderContext = {
+                    canvasContext: context,
+                    viewport: scaledViewport,
+                    // 텍스트 렌더링 강제
+                    enableWebGL: false,
+                };
+                
+                // 텍스트를 포함한 전체 렌더링
+                await page.render(renderContext).promise;
+                
+                // 텍스트가 제대로 렌더링되었는지 확인하기 위해 텍스트 콘텐츠 가져오기
+                const textContent = await page.getTextContent();
+                console.log('페이지 텍스트 콘텐츠:', textContent.items.length, '개 항목');
+                if (textContent.items.length > 0) {
+                    console.log('첫 번째 텍스트:', textContent.items[0].str);
+                }
+                
+                // 텍스트가 제대로 렌더링되었는지 확인
+                console.log('페이지 렌더링 완료:', pageNum + 1, '크기:', canvas.width, 'x', canvas.height);
+                
+                return pageDiv;
+            } catch (error) {
+                console.error('페이지 렌더링 실패:', error);
+                return null;
+            }
+        }
+
+        // 이전 페이지
+        function prevPage() {
+            const isMobile = window.innerWidth <= 768;
+            
+            if (isMobile) {
+                // 모바일: 1페이지씩 이동
+                if (currentPage > 0) {
+                    currentPage--;
+                    renderPages();
+                }
+            } else {
+                // 데스크톱: 책처럼 펼쳐진 형태로 이동
+                if (currentPage === 0) {
+                    // 표지에서 뒤로 갈 수 없음
+                    return;
+                } else if (currentPage === 1) {
+                    // 2-3 spread에서 표지로
+                    currentPage = 0;
+                } else {
+                    // 이전 spread로 (2페이지씩 뒤로)
+                    currentPage = Math.max(currentPage - 2, 1);
+                }
+                renderPages();
+            }
+        }
+
+        // 다음 페이지
+        function nextPage() {
+            const isMobile = window.innerWidth <= 768;
+            
+            if (isMobile) {
+                // 모바일: 1페이지씩 이동
+                if (currentPage < totalPages - 1) {
+                    currentPage++;
+                    renderPages();
+                }
+            } else {
+                // 데스크톱: 책처럼 펼쳐진 형태로 이동
+                if (currentPage === 0) {
+                    // 표지에서 다음 spread로 (2-3페이지)
+                    currentPage = 1;
+                } else {
+                    // 다음 spread로 (2페이지씩 앞으로)
+                    currentPage = Math.min(currentPage + 2, totalPages - 2);
+                }
+                renderPages();
+            }
+        }
+
+        // 페이지 카운터 업데이트
+        function updatePageCounter() {
+            // 페이지 검색 입력 필드 업데이트
+            const pageInput = document.getElementById('pageInput');
+            if (pageInput) {
+                pageInput.value = currentPage + 1;
+            }
+        }
+
+        // 페이지로 이동
+        function goToPage() {
+            const pageInput = document.getElementById('pageInput');
+            const pageNum = parseInt(pageInput.value);
+            
+            if (isNaN(pageNum) || pageNum < 1 || pageNum > totalPages) {
+                alert(`1부터 ${totalPages}까지의 페이지 번호를 입력해주세요.`);
+                return;
+            }
+            
+            const isMobile = window.innerWidth <= 768;
+            const targetPageIndex = pageNum - 1; // 사용자 입력은 1부터 시작, 인덱스는 0부터
+            
+            if (isMobile) {
+                // 모바일: 직접 해당 페이지로 이동
+                currentPage = targetPageIndex;
+            } else {
+                // 데스크톱: 책 형태로 보여주기 위해 spread 계산
+                if (targetPageIndex === 0) {
+                    // 표지
+                    currentPage = 0;
+                } else if (targetPageIndex === 1 || targetPageIndex === 2) {
+                    // 2-3페이지 spread
+                    currentPage = 1;
+                } else {
+                    // 그 외: 왼쪽 페이지가 되도록
+                    // 짝수 페이지면 그 페이지가 왼쪽, 홀수 페이지면 이전 페이지가 왼쪽
+                    if (targetPageIndex % 2 === 0) {
+                        // 짝수 페이지 (4, 6, 8...)는 왼쪽 페이지
+                        currentPage = targetPageIndex - 1;
+                    } else {
+                        // 홀수 페이지 (5, 7, 9...)는 오른쪽 페이지, 왼쪽 페이지로 이동
+                        currentPage = targetPageIndex - 1;
+                    }
+                }
+            }
+            
+            renderPages();
+        }
+
+        // Enter 키로 페이지 이동
+        document.addEventListener('DOMContentLoaded', function() {
+            const pageInput = document.getElementById('pageInput');
+            if (pageInput) {
+                pageInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        goToPage();
+                    }
+                });
+            }
+        });
+
+        // 네비게이션 버튼 상태 업데이트
+        function updateNavButtons() {
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            
+            prevBtn.disabled = currentPage === 0;
+            nextBtn.disabled = currentPage === totalPages - 1;
+        }
+
+        // 키보드 네비게이션
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft' && currentPage > 0) {
+                prevPage();
+            } else if (e.key === 'ArrowRight' && currentPage < totalPages - 1) {
+                nextPage();
+            }
+        }, { passive: true });
+
+        // 모바일 스와이프
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        const bibleContainer = document.getElementById('bibleContainer');
+        
+        bibleContainer.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+        });
+
+        bibleContainer.addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        });
+
+        function handleSwipe() {
+            const swipeThreshold = 50;
+            const diff = touchStartX - touchEndX;
+            
+            if (Math.abs(diff) > swipeThreshold) {
+                if (diff > 0 && currentPage < totalPages - 1) {
+                    // 왼쪽으로 스와이프 (다음 페이지)
+                    nextPage();
+                } else if (diff < 0 && currentPage > 0) {
+                    // 오른쪽으로 스와이프 (이전 페이지)
+                    prevPage();
+                }
+            }
+        }
+
+        // 초기화
+        document.addEventListener('DOMContentLoaded', async () => {
+            // HamburgerManager는 script.js에서 자동으로 초기화됨
+            
+            // sleepism bible.pdf 파일 자동 로드
+            // 로컬 파일 시스템에서는 FileReader 사용
+            try {
+                const response = await fetch('sleepism bible.pdf');
+                if (response.ok) {
+                    // 서버를 통해 접근 가능한 경우
+                    loadPDFFromURL('sleepism bible.pdf');
+                } else {
+                    throw new Error('PDF 파일을 찾을 수 없습니다. 로컬 서버를 사용해주세요.');
+                }
+            } catch (error) {
+                console.error('PDF 로드 시도 실패:', error);
+                const loadingEl = document.getElementById('loading');
+                loadingEl.textContent = 'PDF 파일을 로드할 수 없습니다. 로컬 서버를 사용해주세요. (예: python -m http.server)';
+                loadingEl.style.color = '#ff0000';
+            }
+        });
+    </script>
+</body>
+</html>
+
